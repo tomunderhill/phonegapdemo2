@@ -19,13 +19,20 @@
 -->
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 
     <title>Cordova WP7</title>
 
-	  <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
+	  <link rel="stylesheet" href="jquery.mobile-1.2.0.css" type="text/css"/>
+	  <link rel="stylesheet" href="jquery.mobile.structure-1.2.0.css" type="text/css" />
+	  <link rel="stylesheet" href="jquery.mobile.theme-1.2.0.css" type="text/css" />
+	  <link rel="stylesheet" href="jquery.tweet.css" type="text/css" />
 
+      <!--<script type="text/javascript" charset="utf-8" src="jquery-1.8.2.js"></script>-->
+      <script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8" src="jquery.mobile-1.2.0.js"></script>
+    <script type="text/javascript" charset="utf-8" src="jquery.tweet.js"></script>
 
     <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
 
@@ -38,30 +45,97 @@
         // once the device ready event fires, you can safely do your thing! -jm
         function onDeviceReady()
         {
-        // IE does NOT provide an alert method, you can patch it with this line after deviceready.
-        window.alert = window.alert || navigator.notification.alert;
+            // IE does NOT provide an alert method, you can patch it with this line after deviceready.
+            window.alert = window.alert || navigator.notification.alert;
+            console.log("onDeviceReady. You should see this message in Visual Studio's output window.");
 
-        console.log("onDeviceReady. You should see this message in Visual Studio's output window.");
-        updateDeviceInfo();
 
         }
+
+        function GetTheTweets() {
+            $("#othertweets").tweet({
+                username: $('#username').val(),
+                join_text: "auto",
+                avatar_size: 32,
+                count: 3,
+                auto_join_text_default: "we said,",
+                auto_join_text_ed: "we",
+                auto_join_text_ing: "we were",
+                auto_join_text_reply: "we replied to",
+                auto_join_text_url: "we were checking out",
+                loading_text: "loading tweets..."
+            });
+        }
+
+        $(function () {
+            jQuery(function ($) {
+                $("#tweets-div").tweet({
+                    username: "eduserv",
+                    join_text: "auto",
+                    avatar_size: 32,
+                    count: 3,
+                    auto_join_text_default: "we said,",
+                    auto_join_text_ed: "we",
+                    auto_join_text_ing: "we were",
+                    auto_join_text_reply: "we replied to",
+                    auto_join_text_url: "we were checking out",
+                    loading_text: "loading tweets..."
+                });
+            });
+
+           
+        });
+
+
+        function addContact() {
+            console.log("addContact()");
+            try {
+
+                console.log("before create");
+
+                // create seems to be failing...
+                var contact = navigator.contacts.create({ "displayName": $('#contactname').val() + " " + $('#contactsurname').val() });
+
+                console.log("contact created");
+
+                var contactName = {
+                    formatted: $('#contactname').val() + " " + $('#contactsurname').val(),
+                    familyName: $('#contactsurname').val(),
+                    givenName: $('#contactname').val(),
+                    middleName: ""
+                };
+
+                console.log("create contactName");
+
+                contact.name = contactName;
+
+                contact.phoneNumbers = [new ContactField('work', $('#phonenumber').val(), true)];
+
+                console.log("create contact phone number");
+
+                contact.save(
+                  function (id) { console.log("Contact saved." + id); },
+                  function (e) { console.log("Contact save failed: " + e.code); }
+                  );
+
+                console.log("saving the contact");
+            }
+            catch (e) {
+                //alert(e);
+                console.log("failed to save contact");
+            }
+
+            $('#dialogpage').dialog('close');
+        };
+
+
 
         function onBackButton()
         {
         console.log("onBackButton");
         }
 
-        function updateDeviceInfo()
-        {
-        document.getElementById("platform").innerHTML = device.platform;
-        document.getElementById("version").innerHTML = device.version;
-        document.getElementById("uuid").innerHTML = device.uuid;
-        document.getElementById("name").innerHTML = device.name;
-        document.getElementById("width").innerHTML = screen.width;
-        document.getElementById("height").innerHTML = screen.height;
-        document.getElementById("colorDepth").innerHTML = screen.colorDepth;
-        };
-
+      
       </script>
 
 
@@ -69,40 +143,68 @@
 
   </head>
   <body>
-    <h1>Cordova Tests</h1>
-    <div id="info">
-      <h4>
-        Platform: <span id="platform"> </span>
-      </h4>
-      <h4>
-        Version: <span id="version"></span>
-      </h4>
-      <h4>
-        UUID: <span id="uuid"> </span>
-      </h4>
-      <h4>
-        Name: <span id="name"></span>
-      </h4>
-      <h4>
-        Width: <span id="width"></span>,   Height: <span id="height">
-          
-        </span>, Color Depth: <span id="colorDepth"></span>
-      </h4>
-    </div>
+      <div id="home" data-role="page" data-theme="b">
+          <div data-role="header" data-theme="b">
+              <h1>The Test App</h1>
+          </div>
+          <div data-role="content">
+              <ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
+                  <li data-role="list-divider" role="heading">Actions</li>
+                  <li><a href="#new-page">See Eduserv tweets</a></li>
+                  <li><a href="#tweets2">See someone elses tweets</a></li>
+                  <li><a href="#dialogpage" data-icon="plus" data-rel="dialog" >Add a contact</a></li>
+              </ul>
+          </div>
+          <!--<div data-role="footer" data-position="fixed" data-theme="e">
+              
+          </div>-->
+      </div>
+      <div id="new-page" data-role="page">
+          <div data-role="header">
+              <a href="#home" data-icon="delete">Go back</a>
+              <h1>Tweets</h1>
+              
+          </div>
+          <div data-role="content">
+              <div id="tweets-div"></div>
+          </div>
+      </div>
+      <div id="tweets2" data-role="page">
+          <div data-role="header">
+              <a href="#home" data-icon="delete">Go back</a>
+              <h1>Someones tweets</h1>
+              
+          </div>
+          <div data-role="content">
+              <label for="username">Enter the username:
+                  <input id="username" name="username" value="" />
+              </label>
+              <input type="button" id="GetTweets" onclick="GetTheTweets()" value="Get the tweets"/>
+              <div id="othertweets"></div>
+          </div>
+      </div>
+      
 
-    <a href="accelerometer.html" class="btn large">Accelerometer</a>
-    <a href="accelerometer2.html" class="btn large">Accel Game</a>
-    <a href="audio.html" class="btn large">Audio Play/Record</a>
-    <a href="camera.html" class="btn large">Camera</a>
-    <a href="capture.html" class="btn large">Capture</a>
-    <a href="compass.html" class="btn large">Compass</a>
-    <a href="network.html" class="btn large">Connection</a>
-    <a href="contacts.html" class="btn large">Contacts</a>
-    <a href="events.html" class="btn large">Events</a>
-    <a href="file.html" class="btn large">File</a>
-    <a href="location.html" class="btn large">Location</a>
-    <a href="notification.html" class="btn large">Notification</a>
-    <a href="storage.html" class="btn large">Local Storage</a>
-    <a href="calculator.html" class="btn large">Calculator (custom plugin)</a>
+      <div id="dialogpage" data-role="page" data-theme="b">
+          <div data-role="header" data-theme="b">
+              <h1>A dialog</h1>
+          </div>
+          <div data-role="content" data-theme="b">
+              <label for="contactname">
+                  What's their first name?
+                  <input id="contactname" name="contactname" value="" />
+              </label>
+              <label for="contactsurname">
+                  What's their surname?
+                  <input id="contactsurname" name="contactsurname" value="" />
+              </label>
+              <label for="phonenumber">
+                  What's their phone number?
+                  <input id="phonenumber" name="phonenumber" value="" type="number" />
+              </label>
+              <input type="button" id="addcontact" value="Add contact" onclick="addContact()"/>
+
+          </div>
+      </div>
   </body>
 </html>
